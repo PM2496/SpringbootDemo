@@ -7,6 +7,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class TokenInterceptor implements HandlerInterceptor {
@@ -20,9 +22,11 @@ public class TokenInterceptor implements HandlerInterceptor {
         response.setCharacterEncoding("utf-8");
         String token = request.getHeader("token");
         if(token != null){
-            boolean result = TokenUtil.verify(token);
-            if(result){
-                System.out.println("通过拦截器");
+            Map<String, String> map = TokenUtil.verify(token);
+            if(map!=null){
+                request.setAttribute("email", map.get("email"));
+                request.setAttribute("username", map.get("username"));
+                System.out.println(map.get("email")+map.get("username")+"通过拦截器");
                 return true;
             }
         }
