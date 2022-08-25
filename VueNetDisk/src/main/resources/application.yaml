@@ -30,3 +30,14 @@ spring:
 #  mapper-locations: classpath:mybatis/mapper/*.xml
 #  configuration:  # 指定mybatis全局配置文件中的相关配置项
 #    map-underscore-to-camel-case: true
+
+server:
+  port: 8080
+  tomcat:
+    accesslog:
+      enabled: true # 设置为true，表示输出 accesslog 日志
+      directory: temp/logs/boot  # 日志文件所在的目录，注意不同操作系统，对绝对路径的定位不同
+      file-date-format: .yyyyMMdd # 按日期进行归档
+      # %h %l %u %t "%r" %s %b %Dms "%{Referer}i" "%{User-Agent}i" "%{X-Request-ID}i" "%{X-Forwarded-For}i"
+      pattern: '%a&%t&%m&%U&%H&%s&%Dms' # 日志输出格式，类似Logback配置
+    basedir: ./public  # 全局基本目录，如果配置，则日志文件对应的目录为 basedir + directory
