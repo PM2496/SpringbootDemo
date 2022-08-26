@@ -1,6 +1,7 @@
 package com.example.work.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.work.bean.Log;
 import com.example.work.bean.User;
 import com.example.work.mapper.UserMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -302,7 +303,36 @@ public class RootController {
     }
 
     @GetMapping(value = "/ShowLogs")
-    public String showLogs(){
-        return "/logs";
+    public String showLogs(@RequestParam("date") String date, HttpServletRequest request) throws IOException {
+        HashMap<String,Object> hs=new HashMap<>();
+        ObjectMapper objectMapper=new ObjectMapper();
+
+//        System.out.println(request.getRealPath("/"));// ./public/
+        String pathName = request.getRealPath("/") +  "temp\\logs\\boot\\access_log." + date + ".log";
+        System.out.println(pathName);
+        File file = new File(pathName);
+        if (!file.exists()) {
+            hs.put("code", 1);
+            System.out.println("所查询日期无日志记录");
+            return objectMapper.writeValueAsString(hs);
+        }
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+        String lineTxt = null;
+        List<Log> logs=new ArrayList<>();
+        while ((lineTxt=br.readLine()) != null){
+            String[] arr = lineTxt.split("&");
+            Log log = new Log();
+            log.setIp(arr[0]);
+            log.setDate(arr[1]);
+            log.setMethod(arr[2]);
+            log.setUrl(arr[3]);
+            log.setProtocol(arr[4]);
+            log.setStatus(arr[5]);
+            log.setTime(arr[6]);
+            logs.add(log);
+        }
+        hs.put("logs", logs);
+        hs.put("code", 0);
+        return objectMapper.writeValueAsString(hs);
     }
 }
